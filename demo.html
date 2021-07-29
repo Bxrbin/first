@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: url(https://www.html5tricks.com/demo/jquery-jplayer/images/82fLDu4.jpg) no-repeat;
+            background-size: 100%;
+        }
+
+        .up_box {
+            width: 100%;
+            height: 80px;
+            background-color: black;
+            position: relative;
+            float: left;
+        }
+
+        .heart,
+        .heart_h,
+        .share {
+            width: 30px;
+            height: 24px;
+            position: absolute;
+            /* left: 5%; */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .heart {
+            left: 5%;
+            background: url(./images/heart.png);
+            background-size: 30px;
+        }
+
+        .heart_h {
+            left: 5%;
+            background: url(./images/heart_h.png);
+            background-size: 30px;
+            display: none;
+        }
+
+        .share {
+            right: 5%;
+            background-size: 35px;
+            background-image: url(./images/share.png);
+        }
+
+        .jp-seek-bar {
+            width: 100%;
+            height: 10px;
+            display: block;
+            position: relative;
+            position: absolute;
+            bottom: 0px;
+            background: black;
+        }
+
+        .jp-play-bar {
+            display: block;
+            position: relative;
+            height: 10px;
+            background: blue;
+        }
+
+
+        .jp-play-bar::after {
+            content: '';
+            width: 10px;
+            height: 20px;
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            background: url(./images/tsqwz1N.png);
+        }
+
+        .down_box {
+            width: 100%;
+            height: 130px;
+            background-color: rgb(105, 42, 60);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            float: left;
+        }
+
+        .down_box>h1 {
+            text-align: center;
+        }
+
+        .jp_play {
+            position: relative;
+            height: 50px;
+        }
+
+        .jp_start {
+            background: url(./images/xlBv5aR.png);
+        }
+
+        .jp_pause {
+            background: url(./images/lIhwduj.png);
+            display: none;
+        }
+
+        .jp_start,
+        .jp_pause {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 40px;
+        }
+
+        .jp-full-screen {
+            position: absolute;
+            right: 10px;
+            width: 35px;
+            height: 35px;
+            background: url(./images/sprite.png) -250px -12px;
+            background-size: 300px;
+        }
+
+        .volume {
+            overflow: hidden;
+            width: 60%;
+            height: 30px;
+            list-style: none;
+            margin: auto;
+        }
+
+        .volume>li {
+            float: left;
+        }
+
+        .volume_one {
+            width: 20px;
+            height: 25px;
+            background: url(./images/3iirf2f.png) no-repeat;
+            background-size: 20px;
+        }
+
+        .volume_two {
+            width: 200px;
+            height: 5px;
+            margin: 12px 20px;
+            transform: translateY(-50%);
+            background-color: gray;
+        }
+
+        .volume_two_ {
+            display: block;
+            height: 5px;
+            background: orange;
+            position: relative;
+        }
+
+        .volume_two_::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: -8px;
+            right: -9px;
+            background: url(./images/handle.png) no-repeat;
+            background-size: 20px;
+        }
+
+        .volume_three {
+            width: 30px;
+            height: 25px;
+            background: url(./images/qqdoddi.png) no-repeat;
+            background-size: 30px;
+        }
+
+        #sel {
+            position: absolute;
+            left: 50px;
+            font-size: 25px;
+        }
+
+        .box {
+            width: 500px;
+            margin: 300px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="box">
+        <video id="video" >
+            <source src="video/video.webm" />
+            <!-- <source src="video/video.mp4" /> -->
+        </video>
+        <div class="up_box">
+            <span class="heart"></span>
+            <span class="heart_h"></span>
+            <span class="share"></span>
+            <div class="jp-seek-bar">
+                <span class="jp-play-bar" style="width: 0px;">
+                </span>
+            </div>
+        </div>
+        <div class="down_box">
+            <h1>
+                <span class="jp-current-time">00:00</span>
+                /
+                <span class="jp-duration">00:00</span>
+            </h1>
+            <div class="jp_play">
+                <p class="jp_start"></p>
+                <p class="jp_pause"></p>
+                <select id="sel">
+                    <option selected>倍速</option>
+                    <option>0.5x</option>
+                    <option>1x</option>
+                    <option>2x</option>
+                    <option>3x</option>
+                </select>
+                <p class="jp-full-screen"></p>
+            </div>
+            <ol class="volume">
+                <li class="volume_one"></li>
+                <li class="volume_two">
+                    <span class="volume_two_" style="width: 10%;"></span>
+                </li>
+                <li class="volume_three"></li>
+            </ol>
+        </div>
+    </div>
+</body>
+<script>
+//webkitRequestFullScreen    谷歌浏览器的全屏属性
+
+    //获取视频
+    var video_ = document.getElementById('video');
+    //获取总时间的渲染位置
+    var jpduration = document.getElementsByClassName('jp-duration')[0];
+    //获取实时时间的渲染位置
+    var jpcurrenttime = document.getElementsByClassName('jp-current-time')[0];
+    //获取播放按键
+    var start = document.getElementsByClassName('jp_start')[0];
+    //获取暂停键
+    var pause = document.getElementsByClassName('jp_pause')[0];
+    //获取视频播放进度条
+    var jpplaybar = document.getElementsByClassName('jp-play-bar')[0];
+    //获取静音音量
+    var volumeone = document.getElementsByClassName('volume_one')[0];
+    //获取最大音量
+    var volumethree = document.getElementsByClassName('volume_three')[0];
+    //获取活动条的父元素
+    var jpseekbar = document.getElementsByClassName('jp-seek-bar')[0];
+    //获取音量
+    var volumetwo = document.getElementsByClassName('volume_two')[0];
+    var volumetwo_ = document.getElementsByClassName('volume_two_')[0];
+    //获取box
+    var box = document.getElementsByClassName('box')[0];
+    //获取倍速
+    var sel=document.getElementById('sel')
+    var sel_ =sel .children;
+    //获取放大按钮
+    var jpfullscreen=document.getElementsByClassName('jp-full-screen')[0];
+
+    video_.addEventListener("canplay", function () {
+        //全屏
+        jpfullscreen.addEventListener('click',function(){
+            video_.webkitRequestFullScreen();
+        },false)
+       
+        //倍速下拉菜单
+        sel.onclick = function () {
+            for(var i=1;i<sel_.length;i++){
+                var a=sel_[i].selected;
+                if(a==true){
+                   var q=sel_[i].innerHTML.substr(0,(sel_[i].innerHTML.length-1));
+                   video_.playbackRate=q;
+                }
+            }
+        };
+
+
+
+        video_.volume = volumetwo_.offsetWidth / volumetwo.offsetWidth;
+
+        var m = parseInt(video_.duration / 60);
+        m = m < 10 ? '0' + m : m;
+        var s = parseInt(video_.duration % 60);
+        s = s < 10 ? '0' + s : s;
+        jpduration.innerHTML = m + ':' + s;
+        //监听开始按钮的点击事件
+        start.addEventListener('click', function () {
+            video_.play();
+            start.style.display = 'none';
+            pause.style.display = 'block';
+
+        });
+        pause.addEventListener('click', function () {
+            video_.pause();
+            pause.style.display = 'none';
+            start.style.display = 'block';
+        });
+        //点击跳转进度条
+        jpseekbar.addEventListener('click', function (e) {
+            run();
+        });
+        //封装的进度条函数
+        function run() {
+            var e = e || window.event;
+            var jpe = e.offsetX; //鼠标到左侧的距离
+            var allwidth = jpseekbar.offsetWidth - 5;
+            var ratio = (jpe / allwidth);
+            video_.currentTime = ratio * video_.duration;
+            time(ratio);
+        }
+        //滑动跳转进度条
+        jpseekbar.addEventListener('mousedown', function () {
+            box.onmousemove = function (e) {
+                run();
+            };
+            box.addEventListener('mouseup', function () {
+                box.onmousemove = '';
+            });
+        });
+
+        //监听实时时间
+        video_.addEventListener('timeupdate', function () {
+            //实时比例
+            var ratio = (video.currentTime / video_.duration);
+            // console.log(video_.duration);
+            time(ratio);
+        });
+
+        function time(ratio) {
+            //实时时间渲染
+            var m_ = parseInt(video.currentTime / 60);
+            m_ = m_ < 10 ? '0' + m_ : m_;
+            var s_ = parseInt(video.currentTime % 60);
+            s_ = s_ < 10 ? '0' + s_ : s_;
+            jpcurrenttime.innerHTML = m_ + ':' + s_;
+            //实时比例
+            jpplaybar.style.width = ratio * 495 + 'px';
+        }
+        //调节音量
+        volumeone.addEventListener('click', function () {
+            video_.volume = 0;
+            volumetwo_.style.width = 0;
+        });
+        volumethree.addEventListener('click', function () {
+            video_.volume = 1;
+            volumetwo_.style.width = 100 + '%';
+        });
+
+        function run_volume() {
+            var e = e || window.event;
+            var jpe = e.offsetX; //鼠标到左侧的距离
+            var allwidth = volumetwo.offsetWidth;
+            var ratio = (jpe / allwidth);
+            video_.volume = ratio;
+            volumetwo_.style.width = ratio * 100 + '%';
+        };
+        volumetwo.addEventListener('click', function (e) {
+            run_volume();
+        });
+        volumetwo.addEventListener('mousedown', function () {
+            box.onmousemove = function (e) {
+                run_volume();
+            };
+            box.addEventListener('mouseup', function () {
+                box.onmousemove = '';
+            });
+        });
+    })
+</script>
+
+</html>
